@@ -22,14 +22,14 @@
 
 ## Overview
 
-**SmartSheet (IRYM 1)** is a web-based platform that allows users to **upload datasets** (CSV, Excel, SQL, JSON, XML) and describe in **natural language prompts** the type of analysis they want.  
+**SmartSheet (IRYM 1)** is a web-based platform that allows users to **upload datasets** (CSV, Excel, JSON) and describe in **natural language prompts** the type of analysis they want. 
 
-The system leverages **Large Language Models (LLMs)** such as QWEN, Phi, and others to:
+The system leverages **Large Language Models (LLMs)** such as QWEN, and Qwen Coder:
 
-1. Interpret user prompts  
-2. Generate Python code dynamically  
-3. Execute the code in a secure environment  
-4. Return results as text or visualizations  
+1. Interpret user prompts 
+2. Generate Python code dynamically 
+3. Execute the code in a secure environment 
+4. Return results as text or visualizations 
 
 This enables users to analyze data without writing code themselves, making data insights accessible to non-technical users.
 
