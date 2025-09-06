@@ -7,7 +7,21 @@
 ![Status](https://img.shields.io/badge/Status-Active-green)
 
 
-<img src="INSTALATION_AND_FASTAPI_CODE/irym-2-inh.png" style="border-radius:50%;" alt="IRYM Series Logo" width="250"/>
+<p align="center">
+  <img src="INSTALATION_AND_FASTAPI_CODE/irym-2-inh.png" 
+       alt="IRYM Series Logo" 
+       width="250" 
+       style="
+           border-radius: 50%; 
+           box-shadow: 0 8px 20px rgba(0,0,0,0.4); 
+           border: 5px solid #F2613F; 
+           transition: transform 0.3s;
+       " 
+       onmouseover="this.style.transform='scale(1.1)';" 
+       onmouseout="this.style.transform='scale(1)';"
+  />
+</p>
+
 
 
 
