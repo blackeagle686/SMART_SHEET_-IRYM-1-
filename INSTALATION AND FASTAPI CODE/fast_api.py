@@ -1,3 +1,49 @@
+# ---------------------------------------------
+# بسم الله الرحمن الرحيم
+"""
+SmartSheet IRYM 1 - FastAPI Public Tunnel Setup
+Developed by:
+  - Mohamed Alaa
+  - Abd El-Rahman Kamal
+"""
+
+# 🔹 Purpose:
+# Run this script to generate a public ngrok URL for your FastAPI backend.
+# Copy the generated URL and paste it into your Django .env (NG_KEY), then run the Django server.
+
+# ================== STEP 1: Install Required Libraries (Once Only) ==================
+# !pip install -qU pyngrok nest_asyncio fastapi uvicorn
+
+# ================== STEP 2: Import Libraries ==================
+import nest_asyncio
+from pyngrok import ngrok
+import uvicorn
+
+# ================== STEP 3: Apply nest_asyncio ==================
+# Enables running FastAPI and ngrok in Jupyter/Colab environments
+nest_asyncio.apply()
+
+# ================== STEP 4: Configure ngrok ==================
+PORT = 7860  # Change this if your FastAPI runs on a different port
+
+# Kill any existing tunnels to avoid conflicts
+ngrok.kill()
+
+# Set your ngrok authentication token
+NGROK_AUTH_TOKEN = "PUT_YOUR_NGROK_AUTH_KEY_HERE"
+if NGROK_AUTH_TOKEN == "PUT_YOUR_NGROK_AUTH_KEY_HERE":
+    raise ValueError("!! Please replace NGROK_AUTH_TOKEN with your actual ngrok token!")
+
+ngrok.set_auth_token(NGROK_AUTH_TOKEN)
+
+# Open a new tunnel
+public_url = ngrok.connect(PORT, bind_tls=True)
+print("------------------- NG-PUBLIC KEY ---------------------")
+print(f"Public FastAPI URL: {public_url}/docs")
+print("Copy this URL and paste it into your Django .env as NG_KEY")
+print("------------------- NG-PUBLIC KEY ---------------------")
+# ----------------------------------------------------------------- 
+
 from fastapi import FastAPI, Form, UploadFile, File, Request, HTTPException
 from enum import Enum
 
@@ -2176,6 +2222,6 @@ class MLModelConfig(BaseModel):
 
 # # =======================================================================================================
 
-# nest_asyncio.apply()
-# uvicorn.run(app, host="0.0.0.0", port=7860)
+nest_asyncio.apply()
+uvicorn.run(app, host="0.0.0.0", port=7860)
 
