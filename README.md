@@ -1,12 +1,23 @@
 # SmartSheet (IRYM 1)  
 
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![Conda](https://img.shields.io/badge/Conda-Environment-green)
+![Django](https://img.shields.io/badge/Django-5.2-purple)
+![FastAPI](https://img.shields.io/badge/FastAPI-Yes-brightgreen)
+![Status](https://img.shields.io/badge/Status-Active-green)
+
 **Version:** 0.1 (MVP)  
-**Date:** 2025-07-30  
-**Author:** Mohamed Alaa  
-**Team:** I Can Read Your Mind (IRYM)  
-  - Mohammed Alaa
-  - Ahmed Ali
-  - Abd El-Rahman Kamal
+**Release Date:** July 30, 2025  
+**Author / Lead Developer:** Mohamed Alaa  
+
+**Contributors to This Version:**  
+- **Mohamed Alaa** – Lead Development | Project Design | Backend | LLM Integration  
+- **Ahmed Ali** – Machine Learning & Training Pipelines  
+- **Abd El-Rahman Kamal** – Machine Learning & Evaluation Pipelines  
+
+
+**Note:** IRYM 1 is the second project in the **I Can Read Your Mind** AI project series. Ahmed Ali and Abd El-Rahman Kamal **actively participated in building this specific version**, contributing essential features and development efforts.
+
 ---
 
 ## Overview
@@ -43,6 +54,7 @@ This enables users to analyze data without writing code themselves, making data 
 - Python 3.10+  
 - Conda (recommended for environment management)  
 - Git  
+
 ---
 
 ## SmartSheet (IRYM 1) - Setup Instructions
@@ -56,9 +68,13 @@ This enables users to analyze data without writing code themselves, making data 
 - Copy the generated public URL and paste it into the **NG_KEY** field in the SmartSheet app interface.
 
 ### 3. Run the Django Server
-- After configuring the NG_KEY, start the **Django development server** to launch the web platform.
+- After configuring the NG_KEY, start the **Django development server** to launch the web platform:
 
 ```bash
 git clone https://github.com/username/SMART_SHEET_-IRYM-1-.git
 cd SMART_SHEET_-IRYM-1-
+# Activate conda environment
+conda activate irym_1
+# Start Django server
+python manage.py runserver
 
