@@ -1,5 +1,5 @@
 # SmartSheet (IRYM 1)  
-
+![IRYM Series Logo](/home/tlk/Downloads/irym-2-inh.png)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![Conda](https://img.shields.io/badge/Conda-Environment-green)
 ![Django](https://img.shields.io/badge/Django-5.2-purple)
