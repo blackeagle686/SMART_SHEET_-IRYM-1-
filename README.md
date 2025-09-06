@@ -8,7 +8,7 @@
 
 
 <p align="center">
-  <img src="IRYM-1-for-github/INSTALATION AND FASTAPI CODE/irym-2-inh.png" alt="IRYM Series Logo" width="250"/>
+  <img src="INSTALATION AND FASTAPI CODE/irym-2-inh.png" alt="IRYM Series Logo" width="250"/>
 </p>
 
 
