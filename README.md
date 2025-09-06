@@ -1,10 +1,16 @@
 # SmartSheet (IRYM 1)  
-![IRYM Series Logo](/home/tlk/Documents/IRYM-1-for-github/INSTALATION AND FASTAPI CODE/irym-2-inh.png)
+
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![Conda](https://img.shields.io/badge/Conda-Environment-green)
 ![Django](https://img.shields.io/badge/Django-5.2-purple)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Yes-brightgreen)
 ![Status](https://img.shields.io/badge/Status-Active-green)
+
+
+<p align="center">
+  <img src="IRYM-1-for-github/INSTALATION AND FASTAPI CODE/irym-2-inh.png" alt="IRYM Series Logo" width="250"/>
+</p>
+
 
 **Version:** 0.1 (MVP)  
 **Release Date:** July 30, 2025  
