@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex">
+    <!-- Main Content -->
+    <main class="flex-grow-1 p-4">
+
+<div class="user-container container">
+    <!-- Recent Analysis Section -->
+    <h1 class="section-title text-center mb-4">Data Science History</h1>
+    <div class="row">
+        {% if analyses %}
+            {% for obj in analyses %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                        <h5 style="margin-bottom: 15px; font-weight:bolder; text-align:center; padding: 2px; margin-right:5px; background-color: var(--text-color); color:var(--background-color); border-radius:5px;" class="card-title">{{ obj.title }}</h5>
+                            <p class="card-title"> <span style="padding: 2px; margin-right:5px; background-color: var(--text-color); color:var(--background-color); border-radius:5px;"> description </span> {{ obj.description|truncatechars:90 }}...</p>
+                            <p dir="rtl" class="card-title">{{ obj.created_at }}</p>
+                            <a href="{% url 'dashboard' obj.id %}" class="btn btn-primary">Go to Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    No analysis yet
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+    </main>
+</div>
+{% endblock %}

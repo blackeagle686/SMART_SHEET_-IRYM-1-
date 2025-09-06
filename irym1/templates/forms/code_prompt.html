@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-light">⚡ Generate Python Code</h2>
+
+    <form method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.prompt }}
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Generate</button>
+    </form>
+
+    {% if code_result %}
+        <div class="mt-4">
+            <h4 class="text-light">📝 Generated Code:</h4>
+
+            <pre class="code-box"><code class="language-python">{{ code_result|escape }}</code></pre>
+
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="code" value="{{ code_result }}">
+                <button type="submit" class="btn btn-success mt-3">💾 Save Code as .py</button>
+            </form>
+        </div>
+    {% endif %}
+
+</div>
+
+<!-- Highlight.js -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+<style>
+    body {
+        background-color: #1e1e1e; /* نفس خلفية VS Code */
+        color: #d4d4d4;
+        height:100%;
+    }
+    .container {
+        max-width: 900px;
+    }
+    .code-box {
+        background-color: #1e1e1e;
+        color: #dcdcdc;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #333;
+        overflow-x: auto;
+        font-family: 'Fira Code', monospace;
+        font-size: 14px;
+    }
+    input, textarea {
+        background-color: #252526 !important;
+        color: #d4d4d4 !important;
+        border: 1px solid #3c3c3c !important;
+        border-radius: 6px;
+        padding: 8px;
+        width: 100%;
+    }
+    button {
+        border-radius: 6px;
+        font-weight: 500;
+    }
+</style>
+
+{% endblock %}

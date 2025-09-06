@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class=" d-flex">   
+    <!-- Main Content -->
+    <main class="flex-grow-1 p-4">
+        <div class="summary-result-box">
+            <div class="summary-result-info row">
+                <div class="title col-md-4">
+                    <h3>Title</h3>
+                </div>
+                <div class="gerated-title col-md-8">
+                    <h3>{{data_title}}</h3>
+                </div>
+                <div class="description col-md-4">
+                    <h3>Description</h3>
+                    </div>
+                    <div class="generated-description col-md-8">
+                        <h3>{{description}}</h3>
+                    </div>
+                </div>
+                
+                <a href="{% url 'dashboard' dash_id %}" class="btn summary-result-room-analysis-details-btn">
+                <i class="bi bi-graph-up"></i> Analysis Dashboard
+            </a>
+        </div>
+            
+         <a href="{% url 'prompt-room' %}" class="summary-reslut-room-more-analysis">New Analysis</a>
+    </main>
+</div>
+    
+{% endblock  %}

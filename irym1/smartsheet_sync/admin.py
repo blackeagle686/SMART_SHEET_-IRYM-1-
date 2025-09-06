@@ -1,0 +1,12 @@
+from django.contrib import admin
+from django.apps import apps
+from django.contrib.admin.sites import AlreadyRegistered
+
+# هات config للـ app الحالي
+app = apps.get_app_config("smartsheet_sync")
+
+for model in app.get_models():
+    try:
+        admin.site.register(model)
+    except AlreadyRegistered:
+        pass

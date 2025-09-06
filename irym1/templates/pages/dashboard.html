@@ -1,0 +1,1386 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <div class=" d-flex">
+
+  {% comment %}============================ Main Content ============================ {% endcomment %}
+    <main class="flex-grow-1 p-4">
+
+      {% comment %}===================================== Page Indexes ===================================== {% endcomment %}
+      <div class="toc-container" >
+        <button class="toc-toggle-btn" onclick="toggleTOC()" title="page Indexes">
+          <i class="bi bi-journal-text me-1"></i> 
+          <i class="bi bi-caret-down-fill"></i>
+        </button>
+
+        <div id="toc-dropdown" class="toc-dropdown">
+          <button class="toc-btn" onclick="switchTab('title-tab')">
+            <i class="bi bi-card-text me-2"></i> Title & Description
+          </button>
+          <button class="toc-btn" onclick="switchTab('outputs-tab')">
+            <i class="bi bi-code-slash me-2"></i> Last Code Updates Results
+          </button>
+          <button class="toc-btn" onclick="switchTab('tables-tab')">
+            <i class="bi bi-bar-chart-line me-2"></i> Descriptive Statistics
+          </button>
+          <button class="toc-btn" onclick="switchTab('viz-tab')">
+            <i class="bi bi-graph-up me-2"></i> Charts
+          </button>
+          <button class="toc-btn" onclick="switchTab('corr-tab')">
+            <i class="bi bi-shuffle me-2"></i> Correlations
+          </button>
+          <button class="toc-btn" onclick="switchTab('quality-tab')">
+            <i class="bi bi-check2-square me-2"></i> Data Quality
+          </button>
+          <button class="toc-btn" onclick="switchTab('cols-tab')">
+            <i class="bi bi-columns me-2"></i> Column Descriptions
+          </button>
+        </div>
+      </div>
+      {% comment %}===================================== Page Indexes ===================================== {% endcomment %}
+
+      <!-- 🔹 Tabs Navigation -->
+      <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="title-tab" data-bs-toggle="tab" data-bs-target="#dash-title-section" type="button" role="tab">
+            <i class="bi bi-card-text me-1"></i> Title & Description
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tables-tab" data-bs-toggle="tab" data-bs-target="#dash-descriptive-statistics-section" type="button" role="tab">
+            <i class="bi bi-table me-1"></i> Statistics
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="viz-tab" data-bs-toggle="tab" data-bs-target="#visualization-charts" type="button" role="tab">
+            <i class="bi bi-bar-chart-line me-1"></i> Visualization
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="corr-tab" data-bs-toggle="tab" data-bs-target="#dash-correlations-section" type="button" role="tab">
+            <i class="bi bi-diagram-3 me-1"></i> Correlations
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="quality-tab" data-bs-toggle="tab" data-bs-target="#dash-quality-report-section" type="button" role="tab">
+            <i class="bi bi-check2-circle me-1"></i> Quality
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="cols-tab" data-bs-toggle="tab" data-bs-target="#dash-col-description-section" type="button" role="tab">
+            <i class="bi bi-columns-gap me-1"></i> Columns
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="outputs-tab" data-bs-toggle="tab" data-bs-target="#main-output-box" type="button" role="tab">
+            <i class="bi bi-lightning-charge me-1"></i> More
+          </button>
+        </li>
+      </ul>
+
+      <!-- 🔹 Tabs Content -->
+      <div class="tab-content p-3 shadow-sm" id="mainTabsContent" style="background:var(--low-color); border-radius:12px;">
+
+        <!-- Title -->
+        <div class="tab-pane fade show active" id="dash-title-section" role="tabpanel">
+                      {% comment %}===================================== Generated Title and Description ===================================== {% endcomment %}
+                  <div id="dash-title-section" class="dash-title-section row mb-5">
+                          <div class="col-md-4 title">
+                              <h4>Title</h4>
+                          </div>
+
+                          <div class="col-md-8 generated-title">
+                              <h4>{{data_title}}</h4>
+                          </div>
+                          <div class="col-md-4 description">
+                              <h4>Description</h4>
+                          </div>
+                          <div class="col-md-8 generated-description">
+                              <h4>{{data_description}}</h4>
+                          </div>
+                  </div>
+                {% comment %}===================================== Generated Title and Description ===================================== {% endcomment %}
+
+        </div>
+
+        <!-- Outputs -->
+        <div class="tab-pane fade" id="main-output-box" role="tabpanel">
+
+            {% comment %}===================================== Code output of User updates or AI generated code ===================================== {% endcomment %}
+            {% comment %} {% if prompt_code_output or prompt_code_error or user_code_output or user_code_error %} {% endcomment %}
+              <div class="show-generated-code">
+                {% if generate_code %}
+                 <h2 class="output-title {% if prompt_code_error or user_code_error %}text-danger{% else %}text-success{% endif %}">
+                  Results
+                </h2>
+                {% else %}
+                 <h2 class="output-title" style="color:var(--text-color);">
+                  <i class="bi bi-lightning-charge me-1"></i> More Details 
+                </h2>
+                {% endif %}
+
+                {% if generated_code %}
+                  <button class="view-code-btn" onclick="showCodeModal()">
+                    <i class="bi bi-eye-fill me-2"></i> View Generated Code
+                  </button>
+                {% endif %}
+
+                <div id="code-btn-wrapper" class="m-0">
+                  <button id="open-code-form2"
+                          data-bs-toggle="modal" 
+                          data-bs-target="#userCodeModal"
+                          title="Run your customized code">
+                    <i class="bi bi-code-slash p-1 m-1"></i>  customized code
+                  </button>
+
+                  <button id="add-new-feature2" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#editTitleModal"
+                    data-bs-toggle="tooltip" 
+                    data-bs-placement="bottom" 
+                    title="Generate code using LLM based on your prompt">
+                    <i class="bi bi-magic"></i> AI code
+                  </button>
+                </div>
+              </div>
+            {% comment %} {% endif %} {% endcomment %}
+
+            <div id="main-output-box" class="pt-5" style="max-width:95vw; margin:auto; position:relative;">
+              {% if prompt_code_output or user_code_output %}
+                <h2>New updates on your Dataset</h2>
+              {% endif %}
+
+              <!-- 🔹 Export Buttons -->
+              <div class="d-flex justify-content-end gap-2 my-2">
+                <button class="btn btn-sm btn-outline-danger" onclick="exportReport('pdf')">
+                  <i class="bi bi-filetype-pdf"></i> Export PDF
+                </button>
+                <button class="btn btn-sm btn-outline-warning" onclick="exportReport('pptx')">
+                  <i class="bi bi-filetype-ppt"></i> Export PPTX
+                </button>
+              </div>
+
+              <!-- Tabs Navigation -->
+              <ul class="nav nav-tabs" id="outputTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="tables-tab" data-bs-toggle="tab" data-bs-target="#tables" type="button" role="tab">
+                    <i class="bi bi-table me-1"></i> Tables
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="charts-tab" data-bs-toggle="tab" data-bs-target="#charts" type="button" role="tab">
+                    <i class="bi bi-bar-chart-line me-1"></i> Charts
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="insights-tab" data-bs-toggle="tab" data-bs-target="#insights" type="button" role="tab">
+                    <i class="bi bi-lightbulb me-1"></i> Insights
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="errors-tab" data-bs-toggle="tab" data-bs-target="#errors" type="button" role="tab">
+                    <i class="bi bi-exclamation-triangle me-1"></i> Errors
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <a class="nav-link" id="raw-output-tab" data-bs-toggle="tab" href="#raw-output" role="tab">
+                    <i class="bi bi-code-slash me-1"></i> Raw Output
+                  </a>
+                </li>
+              </ul>
+
+              <!-- Tabs Content -->
+              <div class="tab-content shadow-sm" id="outputTabsContent" style="overflow:auto; max-height:80vw; background:var(--low-color); border-radius:12px;">
+                <div class="tab-pane fade show active p-3 animate__animated" id="tables" role="tabpanel"></div>
+                <div class="tab-pane fade p-3 animate__animated" id="charts" role="tabpanel">
+                  <div id="charts-grid" class="row g-4"></div>
+                </div>
+                <div class="tab-pane fade p-3 animate__animated" id="insights" role="tabpanel"></div>
+                <div class="tab-pane fade p-3 animate__animated" id="errors" role="tabpanel"></div>
+                <div class="tab-pane fade" id="raw-output"></div>
+              </div>
+            </div>
+
+            <!-- 🔹 Loading Spinner -->
+            <div id="loading-spinner" style="display:none; text-align:center; margin-top:20px;">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-2 text-muted">Generating reports...</p>
+            </div>
+
+            <script>
+              function showSpinner() {
+                document.getElementById("loading-spinner").style.display = "block";
+              }
+              function hideSpinner() {
+                document.getElementById("loading-spinner").style.display = "none";
+              }
+
+              function renderOutputs(rawOutput) {
+                showSpinner();
+                setTimeout(() => {
+                  let cleanOutput = rawOutput.replace(/\n/g, '').trim();
+                  let blocks = cleanOutput.match(/<table.*?>.*?<\/table>|<img[^>]+?>|<h[1-3].*?>.*?<\/h[1-3]>|<p.*?>.*?<\/p>/gs) || [];
+                    
+                  let tablesHTML = [];
+                  let chartsHTML = [];
+                  let insightsHTML = [];
+                  let errorsHTML = [];
+                  let rawCodeHTML = [];
+
+                  blocks.forEach((block, index) => {
+                    let parser = new DOMParser();
+                    let doc = parser.parseFromString(block, "text/html");
+                    
+                    let table = doc.querySelector("table");
+                    if (table) {
+                      table.classList.add("table", "table-bordered", "pandas-table");
+                      tablesHTML.push(`
+                        <div class="table-wrapper">
+                          ${table.outerHTML}
+                          <div class="mt-2 d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="downloadTableCSVClient(${index})">⬇️ Quick CSV</button>
+                            <button class="btn btn-sm btn-outline-dark" onclick="downloadTableCSVServer(${index})">⬇️ Server CSV</button>
+                          </div>
+                        </div>`);
+                      return;
+                    }
+                    
+                    let img = doc.querySelector("img");
+                    if (img) {
+                      img.classList.add("img-fluid", "shadow-sm", "rounded-3");
+                      chartsHTML.push(`
+                        <div class="col-md-6 text-center">
+                          ${img.outerHTML}
+                          <button class="btn btn-sm btn-outline-success mt-2" onclick="downloadImage(this.previousElementSibling)">⬇️ Download PNG</button>
+                        </div>`);
+                      return;
+                    }
+                    
+                    let heading = doc.querySelector("h1,h2,h3");
+                    if (heading) {
+                      insightsHTML.push(heading.outerHTML);
+                      return;
+                    }
+                    
+                    let p = doc.querySelector("p");
+                    if (p) {
+                      p.classList.add("text-muted", "insight");
+                      insightsHTML.push(p.outerHTML);
+                      return;
+                    }
+                  });
+
+                  rawCodeHTML.push(`
+                    <div class="raw-output-box bg-light p-3 rounded border">
+                      <pre style="white-space: pre-wrap; font-size:13px; color:#222;">
+          ${rawOutput}
+                      </pre>
+                    </div>
+                  `);
+
+                  document.getElementById("tables").innerHTML = tablesHTML.join("<br>");
+                  document.getElementById("charts-grid").innerHTML = chartsHTML.join("");
+                  document.getElementById("insights").innerHTML = insightsHTML.join("<br>");
+                  document.getElementById("raw-output").innerHTML = rawCodeHTML.join("<br>");
+                  
+                  let backendError = `{{ prompt_code_error|default_if_none:""|escapejs }}\n{{ user_code_error|default_if_none:""|escapejs }}`.trim();
+                  if (backendError) {
+                    errorsHTML.push(`
+                      <div class="alert alert-danger shadow-sm rounded-3 p-3">
+                        <h5 class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Execution Error</h5>
+                        <pre style="white-space: pre-wrap; background:#fff0f0; padding:10px; border-radius:6px; border:1px solid #f5c2c7;">
+          ${backendError}
+                        </pre>
+                      </div>
+                    `);
+                  }
+                  document.getElementById("errors").innerHTML = errorsHTML.join("<br>");
+                  
+                  hideSpinner();
+                }, 600);
+              }
+
+              // ✅ CSV download (client)
+              function downloadTableCSVClient(index) {
+                let table = document.querySelectorAll("#tables table")[index];
+                let rows = [...table.rows].map(r => [...r.cells].map(c => c.innerText).join(","));
+                let csv = rows.join("\n");
+                let blob = new Blob([csv], { type: "text/csv" });
+                let a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "table.csv";
+                a.click();
+              }
+
+              // ✅ CSV download (server)
+              function downloadTableCSVServer(index) {
+                let table = document.querySelectorAll("#tables table")[index];
+                if (!table) return;
+
+                fetch("/dashboard/export/csv/", {
+                  method: "POST",
+                  headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/x-www-form-urlencoded"
+                  },
+                  body: new URLSearchParams({ html: table.outerHTML })
+                })
+                .then(res => {
+                  if (!res.ok) throw new Error("Failed to download CSV");
+                  return res.blob();
+                })
+                .then(blob => {
+                  let url = window.URL.createObjectURL(blob);
+                  let a = document.createElement("a");
+                  a.href = url;
+                  a.download = "table.csv";
+                  a.click();
+                })
+                .catch(err => alert(err.message));
+              }
+
+              // ✅ PNG download
+              function downloadImage(img) {
+                let url = img.src;
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "chart.png";
+                a.click();
+              }
+
+              // ✅ Export PDF / PPTX
+              function exportReport(type) {
+                let content = document.getElementById("outputTabsContent").innerHTML;
+                fetch(`/dashboard/export/${type}/`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                  },
+                  body: JSON.stringify({ html: content })
+                })
+                .then(res => {
+                  if (!res.ok) throw new Error(`Export failed: ${res.status}`);
+                  return res.blob();
+                })
+                .then(blob => {
+                  let url = window.URL.createObjectURL(blob);
+                  let a = document.createElement("a");
+                  a.href = url;
+                  a.download = `report.${type}`;
+                  a.click();
+                })
+                .catch(err => alert(err.message));
+              }
+
+              // ✅ CSRF helper
+              function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                  let cookies = document.cookie.split(';');
+                  for (let i = 0; i < cookies.length; i++) {
+                    let cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                    }
+                  }
+                }
+                return cookieValue;
+              }
+
+              // ✅ Initial render
+              let rawFromPython = `{{ prompt_code_output|default_if_none:""|safe }}\n{{ user_code_output|default_if_none:""|safe }}`;
+              renderOutputs(rawFromPython);
+            </script>
+        </div>
+
+
+
+        <!-- Tables -->
+        <div class="tab-pane fade" id="dash-descriptive-statistics-section" role="tabpanel">
+                        {% comment %}===================================== Descriptive Statistics section ===================================== {% endcomment %}
+                  <div id="dash-descriptive-statistics-section" class="dash-descriptive-statistics-section mt-5">
+                      <div class="title d-flex justify-content-between align-items-center">
+                          <h3>Descriptive Statistics</h3>
+                          <!-- Button to trigger modal -->
+                          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#descStatsModal">
+                              Show Full Table
+                          </button>
+                      </div>
+
+                      <!-- Small preview table -->
+                      <div class="restlted-table table-responsive shadow rounded" style="max-width: 95vw !important; overflow: scroll; max-height:30vw;">
+                          <table class="table table-bordered table-striped table-hover align-middle text-center">
+                              <thead class="table-dark">
+                                  <tr>
+                                      <th>Column</th>
+                                      <th>Count</th>
+                                      <th>Mean</th>
+                                      <th>Std Dev</th>
+                                      <th>Min</th>
+                                      <th>Q1 25%</th>
+                                      <th>Median (Q2)</th>
+                                      <th>Q3 75%</th>
+                                      <th>Max</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for col, stats in desc.items %}
+                                      <tr>
+                                          <td class="fw-bold">{{ col }}</td>
+                                          <td>{{ stats.Count|floatformat:3|default:"-" }}</td>
+                                          <td>{{ stats.Mean|floatformat:3|default:"-" }}</td>
+                                          <td>{{ stats.StdDev|floatformat:3|default:"-" }}</td>
+                                          <td>{{ stats.Min|floatformat:3|default:"-" }}</td>
+                                          <td>{{ stats.q25|floatformat:3|default:"-" }}</td>
+                                          <td>{{ stats.median|floatformat:3|default:"-" }}</td>
+                                          <td>{{ stats.q75|floatformat:3|default:"-" }}</td>
+                                          <td>{{ stats.Max|floatformat:3|default:"-" }}</td>
+                                      </tr>
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+
+                  <!-- Modal -->
+                  <div class="modal fade mt-5" style="z-index:50000" id="descStatsModal" tabindex="-1" aria-labelledby="descStatsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="descStatsModalLabel">Full Descriptive Statistics Table</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="table-responsive" style="max-height:70vh; overflow:auto;">
+                            <table class="table table-bordered table-striped table-hover align-middle text-center">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Column</th>
+                                        <th>Count</th>
+                                        <th>Mean</th>
+                                        <th>Std Dev</th>
+                                        <th>Min</th>
+                                        <th>Q1 25%</th>
+                                        <th>Median (Q2)</th>
+                                        <th>Q3 75%</th>
+                                        <th>Max</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for col, stats in desc.items %}
+                                        <tr>
+                                            <td class="fw-bold">{{ col }}</td>
+                                            <td>{{ stats.Count|floatformat:3|default:"-" }}</td>
+                                            <td>{{ stats.Mean|floatformat:3|default:"-" }}</td>
+                                            <td>{{ stats.StdDev|floatformat:3|default:"-" }}</td>
+                                            <td>{{ stats.Min|floatformat:3|default:"-" }}</td>
+                                            <td>{{ stats.q25|floatformat:3|default:"-" }}</td>
+                                            <td>{{ stats.median|floatformat:3|default:"-" }}</td>
+                                            <td>{{ stats.q75|floatformat:3|default:"-" }}</td>
+                                            <td>{{ stats.Max|floatformat:3|default:"-" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% comment %}===================================== Descriptive Statistics section ===================================== {% endcomment %}
+
+        </div>
+
+        <!-- Visualization -->
+        <div class="tab-pane fade" id="visualization-charts" role="tabpanel">
+          {% comment %}===================================== visualization Plotly section ===================================== {% endcomment %}
+          <div id="visualization-charts" 
+              class="row g-4 mx-auto mt-5" 
+              style="max-width: 95vw; max-height:40vw; overflow:auto;">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2>Data visualization</h2>
+              
+              <!-- ✅ الفورم -->
+              <form method="post" class="d-flex gap-2 align-items-center">
+                {% csrf_token %}
+                <div class="form-group">
+                  {{ chart_form.chart_count.label_tag }}
+                  {{ chart_form.chart_count }}
+                </div>
+                <div class="form-group">
+                  {{ chart_form.sample_size.label_tag }}
+                  {{ chart_form.sample_size }}
+                </div>
+                <button type="submit" class="btn btn-sm btn-primary">more descriptive visualization</button>
+              </form>
+
+              {% if check_add_plot %}
+                <button id="open-plotly-form2" 
+                        class="btn btn-sm btn-outline-primary mb-3"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#plotlyChartModal"
+                        title="Add Plotly Chart">
+                    <i class="bi bi-bar-chart-line"></i> Add Chart
+                </button>
+              {% endif %}
+            </div>
+
+            {% if plotly_output %}
+              {% for chart in plotly_output %}
+                <div class="
+                    {% if check_more_plots %}
+                        col-12 col-md-6 col-xl-4
+                    {% elif check_add_plot %}
+                        col-12
+                    {% else %}
+                        col-12 col-md-6 col-xl-4
+                    {% endif %}
+                ">
+                  <div class="card shadow-sm h-100 border-0 mb-3">
+                    <div class="card-body p-2">
+                      <!-- Container for Plotly -->
+                      <div id="plotly-chart-{{ forloop.counter }}" style="height:300px;"></div>
+
+                      <!-- زرار فتح الرسم في Popup -->
+                      <button class="btn btn-sm btn-outline-secondary mt-2 w-100"
+                              data-bs-toggle="modal" 
+                              data-bs-target="#plotlyModal{{ forloop.counter }}">
+                        🔍 Show Full Chart
+                      </button>
+
+                      <!-- Store raw JSON from backend -->
+                      <script id="chart_{{ forloop.counter }}" type="application/json">
+                        {{ chart|safe }}
+                      </script>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Modal لكل رسم -->
+                <div class="modal fade mt-5" style="z-index:500000;" id="plotlyModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Full Chart View</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body" style="max-height:80vh; overflow:auto;">
+                        <div id="plotly-chart-full-{{ forloop.counter }}" style="height:75vh;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="col-12">
+                <div class="alert alert-warning text-center">
+                  ⚠️ No charts generated yet. Submit a prompt to generate Plotly charts.
+                </div>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Plotly JS -->
+          <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+          <script>
+            document.addEventListener("DOMContentLoaded", function () {
+              {% for chart in plotly_output %}
+                try {
+                  var figData = JSON.parse(document.getElementById("chart_{{ forloop.counter }}").textContent);
+
+                  if (figData && figData.data) {
+                    Plotly.newPlot(
+                      "plotly-chart-{{ forloop.counter }}",
+                      figData.data,
+                      figData.layout || {},
+                      {responsive: true}
+                    );
+
+                    Plotly.newPlot(
+                      "plotly-chart-full-{{ forloop.counter }}",
+                      figData.data,
+                      figData.layout || {},
+                      {responsive: true}
+                    );
+                  } else {
+                    document.getElementById("plotly-chart-{{ forloop.counter }}").innerText = "⚠️ No valid data";
+                  }
+                } catch(e) {
+                  document.getElementById("plotly-chart-{{ forloop.counter }}").innerText = "⚠️ Error parsing chart";
+                  console.error("Plotly render error:", e);
+                }
+              {% endfor %}
+
+              // ✅ اعادة ضبط حجم الرسومات عند فتح التاب
+              document.addEventListener("shown.bs.tab", function () {
+                document.querySelectorAll("[id^='plotly-chart-']").forEach(el => {
+                  try { Plotly.Plots.resize(el); } catch(e) {}
+                });
+              });
+            });
+          </script>
+          {% comment %}===================================== visualization Plotly section ===================================== {% endcomment %}
+        </div>
+
+
+        <!-- Correlations -->
+        <div class="tab-pane fade" id="dash-correlations-section" role="tabpanel">
+            {% comment %}===================================== Correlations section ===================================== {% endcomment %}
+            <div id="dash-correlations-section" class="dash-correlations-section mt-5">
+                <div class="title d-flex justify-content-between align-items-center">
+                    <h3>Correlations & Relationships</h3>
+
+                    <!-- زرار فتح الجدول كامل -->
+                    <button class="btn btn-sm btn-outline-secondary"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#correlationModal">
+                        <i class="bi bi-search me-2"></i> Show Full Table
+                    </button>
+                </div>
+
+                <!-- نسخة مصغرة من الجدول -->
+                <div class="restlted-table" style="max-width:95vw !important; overflow:auto; max-height:30vw;">
+                    <table class="table table-bordered table-sm text-center align-middle" id="correlation-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="sticky-header">Columns</th>
+                                {% for col in corr_columns %}
+                                    <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row, values in corr_rows %}
+                                <tr>
+                                    <th class="sticky-column">{{ row }}</th>
+                                    {% for val in values %}
+                                        <td>{{ val|floatformat:2 }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal fade" id="correlationModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xxl modal-dialog-centered" style="max-width:95vw;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Full Correlation Table</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="max-height:80vh; overflow:auto; overflow-x:auto;">
+                            <div style="min-width:1200px; overflow-x:auto;">
+                                <table class="table table-bordered table-hover text-center align-middle w-100" id="modal-correlation-table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="sticky-header">Columns</th>
+                                            {% for col in corr_columns %}
+                                                <th>{{ col }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row, values in corr_rows %}
+                                            <tr>
+                                                <th class="sticky-column">{{ row }}</th>
+                                                {% for val in values %}
+                                                    <td>{{ val|floatformat:2 }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% comment %}===================================== Correlations section ===================================== {% endcomment %}
+        </div>
+
+
+        <!-- Quality -->
+        <div class="tab-pane fade" id="dash-quality-report-section" role="tabpanel">
+
+                {% comment %}===================================== Quality Report  section ===================================== {% endcomment %}
+                  <div id="dash-quality-report-section" class="dash-quality-report-section mt-5">
+                          <div class="title">
+                              <h3>Data Quality Report</h3>
+                          </div>
+                          <div class="restlted-table" style="  max-width: 95vw !important;
+                                                              overflow: scroll;
+                                                              max-height:30vw;">
+                              <table class="table table-bordered">
+                                  <thead>
+                                      <tr>
+                                          <th>Column</th>
+                                          <th>Nulls</th>
+                                          <th>Duplicated</th>
+                                          <th>Notes</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      {% for q in quality %}
+                                          <tr>
+                                              <td>{{ q.column }}</td>
+                                              <td>{{ q.nulls }}</td>
+                                              <td>{{ q.duplicates }}</td>
+                                              <td>
+                                                  {% if q.nulls > 0 and q.duplicates > 0 %}
+                                                      Has Nulls & Duplicates
+                                                  {% elif q.nulls > 0 %}
+                                                      Has Nulls
+                                                  {% elif q.duplicates > 0 %}
+                                                      Has Duplicates
+                                                  {% else %}
+                                                      Clean
+                                                  {% endif %}
+                                              </td>
+                                          </tr>
+                                      {% endfor %}
+                                  </tbody>
+
+                                  <tfoot>
+                                      <tr>
+                                          <th colspan="1" class="text-center">Total</th>
+                                          <td>{{ total_nulls }}</td>
+                                          <td>{{ total_duplicates }}</td>
+                                          <td>-</td>
+                                      </tr>
+                                  </tfoot>
+
+                              </table>
+                          </div>
+                  </div>
+                {% comment %}===================================== Quality Report  section ===================================== {% endcomment %}
+
+        </div>
+
+        <!-- Columns -->
+        <div class="tab-pane fade" id="dash-col-description-section" role="tabpanel">
+                      {% comment %}===================================== Columns Description  section ===================================== {% endcomment %}
+                  <div id="dash-col-description-section" class="dash-col-description-section mt-5" style="max-height:60vw;">
+                          <h2>Column Descriptions</h2>
+                          {% if cols_desc %}
+                              {% for col, desc in cols_desc.items %}
+                                  <div class="col-section row mb-2">
+                                      <div class="col-md-4 title">
+                                          <h4>{{ col }}</h4>
+                                      </div>
+                                      <div class="col-md-8 generated-title">
+                                          <h4>{{ desc }}</h4>
+                                      </div>
+                                  </div>
+                              {% endfor %}
+                          {% else %}
+                              <p>No column descriptions available.</p>
+                          {% endif %}
+                  </div>
+                {% comment %}===================================== Columns Description  section ===================================== {% endcomment %}
+
+        </div>
+
+      </div>
+
+      <!-- ✅ ML and Other Buttons -->
+      <div class="ml-models-detail-btn-wraper mt-4">
+        <a href="{% url 'ml_model_result' analysis_id%}" class="btn btn-warning ml-models-detail-btn">ML Models Details</a>
+        <a href="{% url 'prompt-room' %}" class="btn btn-warning ml-models-detail-btn">New Analysis</a>
+        <button id="add-new-feature" 
+                class="btn ml-models-detail-btn btn-edit" 
+                data-bs-toggle="modal" 
+                data-bs-target="#editTitleModal"
+                title="Add a new feature with AI">
+          <i class="bi bi-magic"></i>
+        </button>
+      </div>
+
+    </main>
+
+    <script>
+      // ✅ Helper: Switch tab programmatically (used by TOC buttons)
+      function switchTab(tabId) {
+        let tabTriggerEl = document.querySelector(`#${tabId}`);
+        if (tabTriggerEl) {
+          let tab = new bootstrap.Tab(tabTriggerEl);
+          tab.show();
+        }
+      }
+    </script>
+  {% comment %}============================ Main Content ============================ {% endcomment %}
+
+
+  </div>
+
+  {% comment %} this script for last tab berfor submitting {% endcomment %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // اقرأ آخر tab مفتوحة من localStorage
+        let lastTab = localStorage.getItem("activeTab");
+        if (lastTab) {
+          let triggerEl = document.querySelector(`button[data-bs-target="${lastTab}"]`);
+          if (triggerEl) {
+            new bootstrap.Tab(triggerEl).show();
+          }
+        }
+
+        // خزّن أي tab جديدة المستخدم يفتحها
+        let tabButtons = document.querySelectorAll('#mainTabs button[data-bs-toggle="tab"]');
+        tabButtons.forEach(function(btn) {
+          btn.addEventListener("shown.bs.tab", function(event) {
+            let target = event.target.getAttribute("data-bs-target");
+            localStorage.setItem("activeTab", target);
+          });
+        });
+      });
+    </script>
+  {% comment %} this script for last tab berfor submitting {% endcomment %}
+
+
+  {% comment %} ========================================== Pop Up Forms and it's Scripts the coder and Ai edit promts forms =========================================={% endcomment %}
+
+    <!-- 🔹 Animated Modal -->
+    <div class="delete-account-container modal fade" id="editTitleModal" tabindex="-1" aria-labelledby="editTitleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width:90%;">
+        <div class="modal-content p-3 rounded-4 shadow-lg animated-modal">
+          
+          <!-- Header -->
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold" id="editTitleModalLabel" style="color:var(--text-color);">
+              <i class="bi bi-magic me-2"></i> Improve Your Dataset with AI
+            </h5>
+            <!-- زر الإغلاق بالأيقونة -->
+            <button type="button" class="close-modal-btn" data-bs-dismiss="modal" aria-label="Close">
+                <i class="bi bi-x-lg" style="font-size: 1.5rem; color: var(--accent-color);"></i>
+            </button>
+          </div>
+          
+          <!-- Body -->
+          <div class="modal-body pt-2">
+            <form method="post" action="" >
+              {% csrf_token %}
+              {{ form.prompt }}
+              
+              <button type="submit" class="btn submit-btn mt-3 w-100">
+                <i class="bi bi-lightning-fill me-2"></i> Generate Code
+              </button>
+            </form>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="fullCodeModal" tabindex="-1" aria-labelledby="fullCodeModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width:80vw; width:auto;" style="max-width:100%;">
+        <div class="modal-content p-4 rounded-4 shadow-lg animated-modal">
+
+          <!-- Header -->
+          <header class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold" id="fullCodeModalLabel">
+              <i class="bi bi-code-slash me-2"></i> Generated Code
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </header>
+
+          <!-- Body -->
+          <section class="modal-body pt-3" style="max-height:90vh; overflow:auto; display:flex; flex-direction:column; gap:15px;">
+            {% if generated_code %}
+              {% for section in generated_code %}
+              <article class="code-section border rounded p-2">
+
+                <!-- Prism.js highlighted code (default view) -->
+                <pre class="language-python p-3 rounded bg-dark"><code class="language-python">{{ section|escape }}</code></pre>
+
+                <!-- Edit form hidden initially -->
+                <div class="edit-form mt-2" style="display:none;">
+                  <form method="post" action="" class="code-edit-form">
+                    {% csrf_token %}
+                    <!-- hidden field (sync value on submit) -->
+                    <input type="hidden" name="user_code" value="{{ section|escape }}">
+                    <!-- Monaco container -->
+                    <div class="editor-container border rounded" style="height:300px;"></div>
+                    <button type="submit" class="btn btn-success mt-2">Run</button>
+                  </form>
+                </div>
+
+                <!-- Edit button -->
+                <button type="button" class="btn btn-outline-primary btn-sm mt-2 edit-btn">Edit</button>
+              </article>
+              {% endfor %}
+            {% else %}
+              <p class="text-muted text-center">No code generated yet.</p>
+            {% endif %}
+          </section>
+
+          <!-- Footer -->
+          <footer class="modal-footer border-0 pt-0">
+            <button class="btn btn-primary" onclick="copyCode()">
+              <i class="bi bi-clipboard me-2"></i> Copy All Code
+            </button>
+          </footer>
+
+        </div>
+      </div>
+    </div>
+    <!-- Monaco Loader -->
+    <script>
+      (function () {
+        let editors = [];
+
+        function ensureMonacoLoaded(callback) {
+          if (window.monaco && window.require) { callback(); return; }
+          if (!window.require) {
+            const loader = document.createElement("script");
+            loader.src = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.min.js";
+            loader.onload = function () {
+              window.require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs" } });
+              window.require(["vs/editor/editor.main"], callback);
+            };
+            document.head.appendChild(loader);
+          } else {
+            window.require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs" } });
+            window.require(["vs/editor/editor.main"], callback);
+          }
+        }
+
+        function initEditor(container, hiddenField) {
+          const editor = monaco.editor.create(container, {
+            value: hiddenField.value || "# Edit your code",
+            language: "python",
+            theme: "vs-dark",
+            automaticLayout: true,
+            minimap: { enabled: false },
+            fontSize: 14
+          });
+          editors.push({ editor, hiddenField });
+        }
+
+        document.getElementById("fullCodeModal").addEventListener("click", function (e) {
+          if (e.target.classList.contains("edit-btn")) {
+            const article = e.target.closest(".code-section");
+            const pre = article.querySelector("pre");
+            const form = article.querySelector(".edit-form");
+            const editorDiv = form.querySelector(".editor-container");
+            const hiddenField = form.querySelector("input[name='user_code']");
+
+            // إظهار / إخفاء
+            pre.style.display = "none";
+            form.style.display = "block";
+            e.target.style.display = "none";
+
+            ensureMonacoLoaded(() => initEditor(editorDiv, hiddenField));
+          }
+        });
+
+        // Sync code on submit
+        document.addEventListener("submit", function (e) {
+          if (e.target.classList.contains("code-edit-form")) {
+            const editorObj = editors.find(ed => ed.hiddenField.form === e.target);
+            if (editorObj) {
+              editorObj.hiddenField.value = editorObj.editor.getValue();
+            }
+          }
+        });
+
+        // Clean up editors on modal close
+        document.getElementById("fullCodeModal").addEventListener("hidden.bs.modal", () => {
+          editors.forEach(ed => ed.editor.dispose());
+          editors = [];
+        });
+      })();
+    </script>
+
+    <script>
+        function showCodeModal() {
+          const modal = new bootstrap.Modal(document.getElementById('fullCodeModal'));
+          modal.show();
+        }
+
+          function copyCode() {
+          let combined = '';
+          document.querySelectorAll('pre code').forEach(el => {
+              combined += el.innerText + '\n\n';
+          });
+          navigator.clipboard.writeText(combined).then(() => {
+              alert('All code copied! ✨');
+          });
+          }
+
+
+        // Toggle edit form
+        document.addEventListener('DOMContentLoaded', () => {
+          document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const form = btn.closest('.code-section').querySelector('.edit-form');
+              form.style.display = form.style.display === 'block' ? 'none' : 'block';
+            });
+          });
+        });
+
+        document.querySelectorAll('.code-editor-wrapper').forEach(wrapper => {
+        const textarea = wrapper.querySelector('textarea');
+        const code = wrapper.querySelector('.code-preview code');
+
+        // Initialize Prism with current value
+        code.innerText = textarea.value;
+        Prism.highlightElement(code);
+
+        // Live update
+        textarea.addEventListener('input', () => {
+          code.innerText = textarea.value;
+          Prism.highlightElement(code);
+        });
+      });
+
+    </script>
+
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+    <script>
+        function toggleTOC() {
+            const dropdown = document.getElementById("toc-dropdown");
+            dropdown.style.display = dropdown.style.display === "flex" ? "none" : "flex";
+        }
+        
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if(element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // إغلاق القائمة إذا ضغط المستخدم خارجها
+        window.addEventListener("click", function(e) {
+            const container = document.querySelector(".toc-container");
+            if(!container.contains(e.target)) {
+                document.getElementById("toc-dropdown").style.display = "none";
+            }
+        });
+
+      var editModal = document.getElementById('editTitleModal');
+      editModal.addEventListener('show.bs.modal', function (event) {
+          const modalContent = editModal.querySelector('.animated-modal');
+          modalContent.style.transform = 'translateY(-20px) scale(0.95)';
+          modalContent.style.opacity = '0';
+          setTimeout(() => {
+              modalContent.style.transform = 'translateY(0) scale(1)';
+              modalContent.style.opacity = '1';
+          }, 50);
+      });
+
+    </script>
+
+  {% comment %} ========================================== Pop Up Forms and it's Scripts the coder and Ai edit promts forms =========================================={% endcomment %}
+
+  {% comment %}================================ this is the User Code Form and it's scripts ================================{% endcomment %}
+
+    <!-- زر لفتح الفورم في Modal -->
+    <button id="open-code-form" 
+            class="floating-btn btn ml-models-detail-btn btn-edit" 
+            data-bs-toggle="modal" 
+            data-bs-target="#userCodeModal"
+            data-bs-toggle="tooltip" 
+            data-bs-placement="bottom" 
+            title="Write your Python code and run it on your dataset">
+        <i class="bi bi-code-slash"></i> 
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade mt-5" id="userCodeModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width:100%;">
+        <div class="modal-content p-4 rounded-4 shadow-lg">
+          <div class="modal-header">
+            <h5 class="modal-title" style="color:var(--text-color);">
+              <i class="bi bi-terminal me-2"></i> Python Code
+            </h5>
+
+            <button type="button" style="background-color:var(--text-color);" class="btn btn-close text-light" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <form id="userCodeForm" method="post" action="">
+            {% csrf_token %}
+            <!-- اختيارية: Django قد يرندر textarea؛ هنخفيه لو موجود -->
+            {{ code_form.user_code }}
+            <!-- حاوية المحرر -->
+            <div id="editor" class="border rounded" style="height:400px;"></div>
+
+            <button type="submit" class="btn btn-success mt-3">Run</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- لا تستخدم type="module" هنا -->
+    <script>
+      (function () {
+        const modalEl = document.getElementById("userCodeModal");
+        const formEl  = document.getElementById("userCodeForm");
+        const editorDiv = document.getElementById("editor");
+
+        let monacoEditor = null;
+
+        // لو Django رندر textarea بأي ID/Name مختلف — هنلقطه أو نخلقه
+        function getOrCreateHiddenField() {
+          // جرّب تلاقي الموجود
+          let field = formEl.querySelector("#user_code_input, textarea[name='user_code'], input[type='hidden'][name='user_code']");
+          if (field) return field;
+
+          // لو مش موجود، أنشئ واحد مخفي
+          field = document.createElement("input");
+          field.type = "hidden";
+          field.name = "user_code";
+          formEl.appendChild(field);
+          return field;
+        }
+
+        // إحضار قيمة أولية من textarea لو موجودة
+        function getInitialValue() {
+          const t = formEl.querySelector("#user_code_input, textarea[name='user_code']");
+          if (t) {
+            // اخفاء أي textarea علشان المستخدم مايشفش محررين
+            t.style.display = "none";
+            return t.value || "";
+          }
+          return "";
+        }
+
+        function createEditor() {
+          const initial = getInitialValue() || "# Write your Python code here\n";
+          monacoEditor = monaco.editor.create(editorDiv, {
+            value: initial,
+            language: "python",
+            theme: "vs-dark",
+            automaticLayout: true,
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineNumbers: "on"
+          });
+
+          // Autocomplete بسيط لباكدجات الداتا ساينس
+          monaco.languages.registerCompletionItemProvider("python", {
+            provideCompletionItems: function () {
+              const K = monaco.languages.CompletionItemKind;
+              const suggestions = [
+                // ================= NumPy =================
+                { label: "import numpy as np", kind: K.Snippet, insertText: "import numpy as np", detail: "NumPy import" },
+                { label: "np.array", kind: K.Function, insertText: "np.array(${1:iterable})", insertTextRules: S },
+                { label: "np.linspace", kind: K.Function, insertText: "np.linspace(${1:start}, ${2:stop}, ${3:num})", insertTextRules: S },
+                { label: "np.arange", kind: K.Function, insertText: "np.arange(${1:start}, ${2:stop}, ${3:step})", insertTextRules: S },
+                { label: "np.zeros", kind: K.Function, insertText: "np.zeros(${1:shape})", insertTextRules: S },
+                { label: "np.ones", kind: K.Function, insertText: "np.ones(${1:shape})", insertTextRules: S },
+                { label: "np.random.rand", kind: K.Function, insertText: "np.random.rand(${1:dim})", insertTextRules: S },
+                { label: "np.mean", kind: K.Function, insertText: "np.mean(${1:data})", insertTextRules: S },
+                { label: "np.std", kind: K.Function, insertText: "np.std(${1:data})", insertTextRules: S },
+
+                // ================= Pandas =================
+                { label: "import pandas as pd", kind: K.Snippet, insertText: "import pandas as pd", detail: "Pandas import" },
+                { label: "pd.DataFrame", kind: K.Class, insertText: "pd.DataFrame(${1:data})", insertTextRules: S },
+                { label: "pd.read_csv", kind: K.Function, insertText: "pd.read_csv('${1:file.csv}')", insertTextRules: S },
+                { label: "pd.read_excel", kind: K.Function, insertText: "pd.read_excel('${1:file.xlsx}')", insertTextRules: S },
+                { label: "df.head()", kind: K.Method, insertText: "df.head(${1:n})", insertTextRules: S },
+                { label: "df.describe()", kind: K.Method, insertText: "df.describe()", insertTextRules: S },
+                { label: "df.info()", kind: K.Method, insertText: "df.info()", insertTextRules: S },
+                { label: "df.groupby", kind: K.Method, insertText: "df.groupby('${1:col}')", insertTextRules: S },
+                { label: "df.merge", kind: K.Method, insertText: "df.merge(${1:other}, on='${2:key}')", insertTextRules: S },
+                { label: "df.plot", kind: K.Method, insertText: "df.plot(${1:kind}='${2:line}')\nplt.show()", insertTextRules: S },
+
+                // ================= Matplotlib / Seaborn =================
+                { label: "import matplotlib.pyplot as plt", kind: K.Snippet, insertText: "import matplotlib.pyplot as plt", detail: "Matplotlib import" },
+                { label: "import seaborn as sns", kind: K.Snippet, insertText: "import seaborn as sns", detail: "Seaborn import" },
+                { label: "plt.plot", kind: K.Function, insertText: "plt.plot(${1:x}, ${2:y})\nplt.show()", insertTextRules: S },
+                { label: "plt.scatter", kind: K.Function, insertText: "plt.scatter(${1:x}, ${2:y})\nplt.show()", insertTextRules: S },
+                { label: "plt.hist", kind: K.Function, insertText: "plt.hist(${1:data}, bins=${2:10})\nplt.show()", insertTextRules: S },
+                { label: "sns.heatmap", kind: K.Function, insertText: "sns.heatmap(${1:data}, annot=True, cmap='coolwarm')\nplt.show()", insertTextRules: S },
+                { label: "sns.pairplot", kind: K.Function, insertText: "sns.pairplot(${1:data})\nplt.show()", insertTextRules: S },
+                { label: "sns.boxplot", kind: K.Function, insertText: "sns.boxplot(x='${1:col}', y='${2:col}', data=${3:df})\nplt.show()", insertTextRules: S },
+
+                // ================= Scikit-learn =================
+                { label: "from sklearn.model_selection import train_test_split", kind: K.Snippet, insertText: "from sklearn.model_selection import train_test_split", detail: "Split data" },
+                { label: "from sklearn.preprocessing import StandardScaler", kind: K.Snippet, insertText: "from sklearn.preprocessing import StandardScaler", detail: "Scaling" },
+                { label: "from sklearn.linear_model import LinearRegression", kind: K.Snippet, insertText: "from sklearn.linear_model import LinearRegression", detail: "Linear Regression" },
+                { label: "from sklearn.ensemble import RandomForestClassifier", kind: K.Snippet, insertText: "from sklearn.ensemble import RandomForestClassifier", detail: "Random Forest" },
+                { label: "train_test_split", kind: K.Function, insertText: "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=${1:0.2}, random_state=${2:42})", insertTextRules: S },
+                { label: "StandardScaler", kind: K.Class, insertText: "scaler = StandardScaler()\nX_scaled = scaler.fit_transform(X)", insertTextRules: S },
+                { label: "LinearRegression", kind: K.Class, insertText: "model = LinearRegression()\nmodel.fit(X_train, y_train)\ny_pred = model.predict(X_test)", insertTextRules: S },
+                { label: "RandomForestClassifier", kind: K.Class, insertText: "rf = RandomForestClassifier(n_estimators=${1:100}, random_state=${2:42})\nrf.fit(X_train, y_train)\ny_pred = rf.predict(X_test)", insertTextRules: S },
+                { label: "accuracy_score", kind: K.Function, insertText: "from sklearn.metrics import accuracy_score\nprint(accuracy_score(y_test, y_pred))", insertTextRules: S },
+                { label: "classification_report", kind: K.Function, insertText: "from sklearn.metrics import classification_report\nprint(classification_report(y_test, y_pred))", insertTextRules: S }
+              ];
+              return { suggestions: suggestions };
+            }
+          });
+        }
+
+        function ensureMonacoLoaded(callback) {
+          if (window.monaco && window.require) {
+            // monaco already loaded
+            callback();
+            return;
+          }
+
+          // حمل الـ loader لو مش موجود
+          if (!window.require) {
+            const loader = document.createElement("script");
+            loader.src = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.min.js";
+            loader.onload = function () {
+              window.require.config({
+                paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs" }
+              });
+              window.require(["vs/editor/editor.main"], callback);
+            };
+            document.head.appendChild(loader);
+          } else {
+            // عندك require: بس حمّل monaco
+            window.require.config({
+              paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs" }
+            });
+            window.require(["vs/editor/editor.main"], callback);
+          }
+        }
+
+        // أنشئ/أعد تهيئة المحرر عند فتح المودال
+        modalEl.addEventListener("shown.bs.modal", function () {
+          // لو محرر قديم متسيب — امسحه
+          if (monacoEditor) {
+            monacoEditor.dispose();
+            monacoEditor = null;
+            editorDiv.innerHTML = "";
+          }
+
+          ensureMonacoLoaded(function () {
+            createEditor();
+            // إصلاح التخطيط بعد ما المودال يبقى ظاهر
+            setTimeout(function () {
+              if (monacoEditor) monacoEditor.layout();
+            }, 50);
+          });
+        });
+
+        // مزامنة القيمة عند الإرسال
+        formEl.addEventListener("submit", function (e) {
+          console.log("Form is submitting...");
+          const hiddenField = getOrCreateHiddenField();
+          const value = monacoEditor ? monacoEditor.getValue() : getInitialValue();
+          hiddenField.value = value;
+          console.log("Code value:", value);
+        });
+
+        // تنظيف عند الإغلاق
+        modalEl.addEventListener("hidden.bs.modal", function () {
+          if (monacoEditor) {
+            monacoEditor.dispose();
+            monacoEditor = null;
+            editorDiv.innerHTML = "";
+          }
+        });
+      })();
+    </script>
+
+  {% comment %}================================ this is the User Code Form and it's scripts ================================ {% endcomment %}
+
+
+  {% comment %}================================ this is the Add Plotly chart Form and it's scripts ================================ {% endcomment %}
+    <!-- زر لفتح فورم رسم Plotly Chart -->
+    <button id="open-plotly-form" 
+            class="floating-btn btn ml-models-detail-btn btn-plotly"
+            data-bs-toggle="modal" 
+            data-bs-target="#plotlyChartModal"
+            data-bs-toggle="tooltip" 
+            data-bs-placement="bottom" 
+            title="Add Plotly Chart">
+        <i class="bi bi-bar-chart-line"></i>
+    </button>
+
+    <!-- Modal لإضافة Chart -->
+    <div class="modal fade mt-5" id="plotlyChartModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-4 rounded-4 shadow-lg">
+          <div class="modal-header">
+            <h5 class="modal-title" style="color:var(--text-color);">
+              <i class="bi bi-bar-chart-line me-2"></i> New Plotly Chart
+            </h5>
+            <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <form id="plotlyChartForm" method="post" action="">
+            {% csrf_token %}
+
+            <!-- اختيار نوع الـ Chart -->
+            <label class="fw-bold mb-2">Choose Chart Type</label>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              {% for value,label in plotly_form.kind.field.choices %}
+                <button type="button" class="btn btn-outline-primary chart-kind-btn" data-kind="{{ value }}">
+                  {{ label }}
+                </button>
+              {% endfor %}
+            </div>
+            {{ plotly_form.kind }}  {# hidden input = id="id_kind" #}
+
+            <!-- إدخال العمود -->
+            <div class="mb-3">
+              {{ plotly_form.col.label_tag }}
+              {{ plotly_form.col }}
+              {% if plotly_form.col.errors %}
+                <div class="text-danger small">{{ plotly_form.col.errors|striptags }}</div>
+              {% endif %}
+            </div>
+
+            <!-- اختيار الـ Colors -->
+            <div class="mb-3">
+              {{ plotly_form.colors.label_tag }}
+              {{ plotly_form.colors }}
+              {% if plotly_form.colors.errors %}
+                <div class="text-danger small">{{ plotly_form.colors.errors|striptags }}</div>
+              {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Generate Chart</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const kindInput = document.getElementById("id_kind");   // hidden input من Django form
+
+        // لما المستخدم يضغط على نوع الـ Chart
+        document.querySelectorAll(".chart-kind-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            kindInput.value = btn.dataset.kind;
+
+            // highlight الزر المختار
+            document.querySelectorAll(".chart-kind-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+          });
+        });
+
+        // عند إرسال الفورم
+        document.getElementById("plotlyChartForm").addEventListener("submit", function(e) {
+          if (!kindInput.value) {
+            e.preventDefault(); // امنع الإرسال لو مفيش نوع محدد
+            alert("⚠️ Please select a chart type before submitting");
+          }
+        });
+      });
+    </script>
+  {% comment %}================================ this is the Add Plotly chart Form and it's scripts ================================ {% endcomment %}
+
+
+  <!-- Bootstrap tooltip init (optional, keep if you use tooltips) -->
+    <script>
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl)
+      })
+    </script>
+{% endblock %}
+

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="d-flex">
+    <!-- Main Content -->
+    <main class="flex-grow-1 p-4">
+        {% if danger_message %}
+                <div class="col-md-12 mb-12" style="max-height:20vw;">
+                    <div class="border p-4 rounded bg-danger text-center ">
+                        <h2 class="text-warning"> {{danger_message}} </h2>
+                        <h6 class="text-light"> {{error_message}} </h6>
+                    </div>
+                </div>
+        {% endif %}
+
+        <!-- Form -->
+        <form method="POST" action="/" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Upload Section -->
+            <div style="margin-left:5vw;" class="row mb-4 prompt-room-files-types-container">
+                <div class="col-4">
+                    <div class="border p-4 rounded bg-white text-center upload-box">
+                        <h1>CSV</h1>
+                        <input id="csv-files" type="file" name="upload" accept=".csv" />
+                        <i class="bi bi-upload"></i>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="border p-4 rounded bg-white text-center upload-box">
+                        <h1>Excel</h1>
+                        <img src="" alt="Additional Data Preview" class="img-fluid" />
+                        <input id="excel-files" type="file" name="upload" accept=".xlsx,.xls" />
+                        <i class="bi bi-upload"></i>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="border p-4 rounded bg-white text-center upload-box">
+                        <h1>JSON</h1>
+                        <img src="" alt="Additional Data Preview" class="img-fluid" />
+                        <input id="json-files" type="file" name="upload" accept=".json" />
+                        <i class="bi bi-upload"></i>
+                    </div>
+                </div>
+
+
+                {% comment %} <div class="col-md-3 mb-3">
+                    <div class="border p-4 rounded bg-white text-center upload-box">
+                        <h1>SQL</h1>
+                        <img src="" alt="Additional Data Preview" class="img-fluid" />
+                        <input id="sql-files" type="file" name="upload" accept=".sql" />
+                        <i class="bi bi-upload"></i>                   
+                    </div>
+                </div> {% endcomment %}
+            </div>
+            
+            <!-- Show the uploaded File -->
+            <div class="prompt-room-file-uploaded-preview">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Prompt Textarea -->
+            <div class="mb-4 prompt-room-text-area-mb-4" style="margin-bottom:150px;">
+                <label class="form-label" for="promptInput">{{ prompt_form.prompt.label }}</label>
+
+                <div class="textarea-container">
+                    <div class="pormpt-room-prompt-container">
+                        {{ prompt_form.prompt }}
+                    </div>
+                    <button type="submit" class="btn btn-warning prompt-room-submit-btn">Start Analysis</button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+        </form>
+
+    </main>
+</div>
+
+{% endblock %}

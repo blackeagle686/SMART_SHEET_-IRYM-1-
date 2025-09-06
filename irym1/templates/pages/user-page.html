@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex">
+    <!-- Main Content -->
+    <main class="flex-grow-1 p-4">
+
+        <div class="user-container">
+
+            <!-- User Profile Card -->
+            <div class="user-card">
+                <div class="profile-image">
+                    <img src="{{ profile.display_image }}" alt="User Image" />
+                </div>
+                
+                <div class="user-info">
+                    <h2 class="user-name">{{ user.get_full_name }}</h2>
+                </div>
+
+                <div class="user-card-buttons">
+                    <a class="nav-link btn" href="{% url 'prompt-room' %}">
+                        <i class="bi bi-plus-square me-2"></i> New Analysis
+                    </a>
+
+                    <a class="nav-link btn mt-1" href="{% url 'settings' %}">
+                        <i class="bi bi-gear me-2"></i> Settings
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Analysis Section -->
+            <div class="analysis-section">
+                <div class="d-flex justify-content-between align-items-center mb-3 user-card-buttons">
+                    <h3 class="section-title">Recent Analyses</h3>
+
+                    <a class="nav-link btn btn-sm " href="{% url 'history' %}">
+                        <i class="bi bi-gear me-2"></i> All Dashboards
+                    </a>
+                </div>
+
+            {% if analyses %}
+                <div class="row g-4">
+                {% for obj in analyses %}
+                    <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100 border-0">
+                        <div class="card-body d-flex flex-column">
+                        <h5 style="margin-bottom: 15px; font-weight:bolder; text-align:center; padding: 2px; margin-right:5px; background-color: var(--text-color); color:var(--background-color); border-radius:5px;" class="card-title">{{ obj.title }}</h5>
+                            <p class="card-title"> <span style="padding: 2px; margin-right:5px; background-color: var(--text-color); color:var(--background-color); border-radius:5px;"> description </span> {{ obj.description|truncatechars:90 }}...</p>
+                            <p dir="rtl" class="card-title">{{ obj.created_at }}</p> 
+                       <div class="mt-auto">
+                            <a href="{% url 'dashboard' obj.id %}" class="btn btn-primary btn-sm w-100">
+                            Go to Dashboard
+                            </a>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert  text-center ">
+                 No analysis yet
+                <div class="d-flex justify-content-between align-items-center mb-3 user-card-buttons">
+                    <h3 class="section-title">Start Your Analysis</h3>
+                    <a class="nav-link btn" href="{% url 'prompt-room' %}">
+                        <i class="bi bi-plus-square me-2"></i> New Analysis
+                    </a>
+                </div>
+
+                </div>
+            {% endif %}
+            </div>
+
+
+        </div>
+
+    </main>
+</div>
+{% endblock %}

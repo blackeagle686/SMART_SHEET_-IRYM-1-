@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex">
+    <!-- Main Content -->
+    <main class="flex-grow-1 p-4">
+
+        <div class="settings-container">
+
+            <h2 class="settings-title">Account Settings</h2>
+
+            <form class="settings-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.first_name.label_tag }}
+                        {{ form.first_name }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.last_name.label_tag }}
+                        {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.age.label_tag }}
+                        {{ form.age }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.language.label_tag }}
+                        {{ form.language }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.theme.label_tag }}
+                        {{ form.theme }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form.user_image.label_tag }}
+                        {{ form.user_image }}
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Password fields: handled manually -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="current-password">Current Password</label>
+                        <input type="password" id="current-password" name="current_password" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <input type="password" id="new-password" name="new_password" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm New Password</label>
+                        <input type="password" id="confirm-password" name="confirm_password" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+
+            <div class="settings-footer mt-3">
+                <a href="{% url 'logout' %}" class="btn btn-warning">Logout</a>
+                <!-- Trigger modal -->
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    Delete Account
+                </button>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content delete-account-container">
+            <form method="post" class="delete-account-form" action="{% url 'delete_account' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p>Enter your username and password to confirm:</p>
+                    {{ delete_form.username.label_tag }}
+                    {{ delete_form.username }}
+                    <br>
+                    {{ delete_form.password.label_tag }}
+                    {{ delete_form.password }}
+                    <br>
+                    <br>
+                    {% if delete_form.errors %}
+                        <div class="alert alert-danger mt-2">
+                            {{ delete_form.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete My Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="flex-grow-1 p-4">
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+
+                <h3>⚙️ Update Training Configuration</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ training_form.as_p }}
+                    <button type="submit" class="btn btn-primary">Retry Training</button>
+                </form>
+
+                {% else %}
+                
+        <div class="dash-title-section row">
+            <div class="col-md-4 title">
+                <h4>ML Tasks</h4>
+            </div>
+            <div class="col-md-8 generated-title">
+                <h4>{{ ml_task }}</h4>
+            </div>
+
+            <div class="col-md-4 title">
+                <h4>Model Type</h4>
+            </div>
+            <div class="col-md-8 generated-title">
+                <h4>{{ ml_algo }}</h4>
+            </div>
+
+            <div class="col-md-4 title">
+                <h4>Model Name</h4>
+            </div>
+            <div class="col-md-8 generated-title">
+                <h4>{{ ml_algo }} Model</h4>
+            </div>
+
+            <div class="col-md-4 description">
+                <h4>Description <small>why used</small></h4>
+            </div>
+            <div class="col-md-8 generated-description">
+                <h4>
+                    This model is used for {{ ml_task|lower }} tasks with the {{ ml_algo }} algorithm.
+                    Hyperparameters: {{ ml_hyperparams|safe }}
+                </h4>
+            </div>
+        </div>
+
+        <div class="model-evaluation-visualization-section mt-5">
+            <div class="title">
+                <h3>Model Evaluation Results</h3>
+            </div>
+            <div class="visualization-charts">
+                <div class="chart row">
+                    <div class="chart-img-wrapper col-md-6">
+                        <canvas id="confusionMatrixChart"></canvas>
+                    </div>
+                    <div class="col-md-6 chart-info">
+                        <h4>Confusion Matrix</h4>
+                        <p>This chart shows the distribution of predictions across different classes. Model accuracy: {{ accuracy }}%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-col-description-section mt-5">
+            <h2>Prediction</h2>
+            <form action="#" method="post" id="predictionForm">
+                {% csrf_token %}
+                {% for f in form_fields %}
+                    <div class="col-section row mb-4 align-items-center">
+                        <div class="col-md-4">
+                            <label class="form-label mb-1">Column Name</label>
+                            <p class="form-control-plaintext">{{ f.name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label mb-1">Data Type</label>
+                            <p class="form-control-plaintext">{{ f.type }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ f.field.id_for_label }}" class="form-label">Value</label>
+                            {{ f.field }}
+                        </div>
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary">Predict</button>
+            </form>
+            {% if prediction_result %}
+                <div class="prediction-result-box mt-5 p-4 rounded shadow-sm" style="background-color: var(--cool-color);" id="predictionResult">
+                    <h4 class="mb-3">🔍 Prediction Result</h4>
+                    <p><strong>Predicted Value:</strong> <span id="predictedValue">{{ prediction_result }}</span></p>
+                    <p><strong>Model Accuracy:</strong> <span id="accuracyValue">{{ accuracy }}%</span></p>
+                    <button class="btn btn-outline-primary mt-3" onclick="resetForm()">Predict Again</button>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="ml-models-detail-btn-wraper mt-5">
+            <a class="btn btn-warning ml-models-detail-btn">
+                <i class="bi bi-bar-chart-fill"></i> Analysis Dashboard
+            </a>
+            <a class="btn btn-warning ml-models-detail-btn">
+                <i class="bi bi-plus-circle-fill"></i> New Analysis
+            </a>
+            <button class="btn btn-success ml-models-detail-btn" onclick="exportToExcel()">
+                <i class="bi bi-file-earmark-excel-fill"></i> Export to Excel
+            </button>
+        </div>
+    {% endif %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.0.0"></script>
+<script>
+    // رسم مخطط الـ Confusion Matrix
+    const chartData = {{ chart_data | safe }};
+    const ctx = document.getElementById('confusionMatrixChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'matrix',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Confusion Matrix',
+                data: chartData.data.flat().map((value, index) => ({
+                    x: index % chartData.labels.length,
+                    y: Math.floor(index / chartData.labels.length),
+                    v: value
+                })),
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                title: { display: true, text: 'Confusion Matrix' }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Predicted' } },
+                y: { title: { display: true, text: 'Actual' } }
+            }
+        }
+    });
+
+    {% if prediction_result %}
+        document.getElementById('predictionResult').style.display = 'block';
+    {% endif %}
+
+    function resetForm() {
+        document.getElementById('predictionForm').reset();
+        document.getElementById('predictionResult').style.display = 'none';
+    }
+
+    function exportToExcel() {
+        const htmlContent = document.querySelector('.dash-title-section').outerHTML + 
+                           document.querySelector('.model-evaluation-visualization-section').outerHTML;
+        fetch('/export_excel/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ html: htmlContent })
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'report.xlsx';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %}

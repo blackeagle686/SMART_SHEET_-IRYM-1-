@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main id="page-wrapper" class="container py-5">
+
+  <!-- عنوان الصفحة -->
+  <div id="page-header" class="text-center mb-5">
+    <h2 id="page-title">⚡ Create New ML Project</h2>
+    <p id="page-subtitle">Upload dataset, configure ML pipeline, and start training</p>
+  </div>
+
+  <!-- رسائل Django -->
+  {% if messages %}
+    <div id="messages-box" class="mb-4">
+      {% for message in messages %}
+        <div class="custom-alert {{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- فورم إنشاء المشروع -->
+  <section id="project-section" class="custom-card mb-4">
+    <h4 class="card-title">📌 Project Info</h4>
+    <form id="project-form" method="POST" action="" class="mt-3">
+      {% csrf_token %}
+      {{ project_form.as_p }}
+      <input type="hidden" name="action" value="create_project">
+      <button type="submit" id="btn-create-project" class="btn-accent">Create Project</button>
+    </form>
+  </section>
+
+  <!-- فورم رفع البيانات -->
+  <section id="dataset-section" class="custom-card mb-4">
+    <h4 class="card-title">📂 Upload Dataset</h4>
+    <form id="dataset-form" method="POST" enctype="multipart/form-data" class="mt-3">
+      {% csrf_token %}
+      {{ dataset_form.as_p }}
+      <input type="hidden" name="action" value="upload_dataset">
+      <input type="hidden" name="project_id" value="{{ project_form.instance.id }}">
+      <button type="submit" id="btn-upload-dataset" class="btn-highlight">Upload Dataset</button>
+    </form>
+  </section>
+
+  <!-- فورم الكونفيج -->
+  {% if config_form %}
+  <section id="config-section" class="custom-card mb-4">
+    <h4 class="card-title">⚙️ ML Configuration</h4>
+    <form id="config-form" method="POST" class="mt-3">
+      {% csrf_token %}
+      {{ config_form.as_p }}
+      <input type="hidden" name="action" value="configure_ml">
+      <input type="hidden" name="project_id" value="{{ project_form.instance.id }}">
+      <button type="submit" id="btn-save-config" class="btn-accent">Save Configuration</button>
+    </form>
+  </section>
+  {% endif %}
+
+  <!-- فورم التقييم -->
+  {% if evaluation_form %}
+  <section id="evaluation-section" class="custom-card mb-4">
+    <h4 class="card-title">📊 Evaluation Config</h4>
+    <form id="evaluation-form" method="POST" class="mt-3">
+      {% csrf_token %}
+      {{ evaluation_form.as_p }}
+      <input type="hidden" name="action" value="evaluation_config">
+      <input type="hidden" name="project_id" value="{{ project_form.instance.id }}">
+      <button type="submit" id="btn-save-eval" class="btn-accent">Save Evaluation</button>
+    </form>
+  </section>
+  {% endif %}
+
+  <!-- زر تشغيل التدريب -->
+  <section id="training-section" class="custom-card mb-4 text-center training-card">
+    <form id="training-form" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="start_training">
+      <input type="hidden" name="project_id" value="{{ project_form.instance.id }}">
+      <button type="submit" id="btn-start-training" class="btn-secondary">🚀 Start Training</button>
+    </form>
+  </section>
+
+</main>
+{% endblock %}
