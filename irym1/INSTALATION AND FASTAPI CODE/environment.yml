@@ -1,0 +1,30 @@
+name: irym_1
+channels:
+  - defaults
+  - conda-forge
+
+dependencies:
+  - python=3.10
+  - django
+  - transformers
+  - matplotlib
+  - seaborn
+  - pandas
+  - numpy
+  - scikit-learn
+  - jupyterlab
+  - ipykernel
+  - openpyxl
+  - requests
+  - aiohttp
+  - uvicorn
+  - fastapi
+  - pip
+  - pip:
+      - plotly
+      - tiktoken
+      - python-dotenv
+      - langchain
+      - duckdb
+      - weasyprint
+      - pptx
